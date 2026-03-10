@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+
+#---Overall Goal of this Script---
+#The aim of this script is to gather system information and log it
+#Specifically, the current processes that are being run by the user
+#The current Memory usage
+#And the Current Disk space
+#Each of which would be logged to a file named system_check.logs
+
+import subprocess
+import sys
+
+def getProcessInfo():
+    """
+    This function gathers information on the processes being run by only the user and prints it out
+    """
+    try:
+        username = subprocess.run(["whoami"], capture_output=True, text=True, check=True).stdout.strip()
+        cmd = f'echo "PID CPU MEM PROCESS" && ps aux | grep [{username[0]}]{username[1:]} | grep -v -- --type=renderer | awk \'{{print $2, $3, $4, $11}}\''
+        result = subprocess.run(
+            cmd, 
+            shell=True,
+            capture_output=True,
+            text=True,
+            check=True
+            )
+        print(f"The processes currently being run by {username} are:")
+        print("\n")
+        print(result.stdout)
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing command: {e}")
+        print(f"Stderr: {e.stderr}")
+        sys.exit(1)
+
+def getStorStat():
+    """
+    This function gathers information about storage space on the system including Total space, Used space and Available space
+    """
+    try: 
+        storage_stat = subprocess.run(["df", "-h"], capture_output=True, text=True, check=True)
+        row = storage_stat.stdout.splitlines()[2].split()
+        used = row[2]
+        avail = row[3]
+        total = row[1]
+        print(f"---STORAGE STATISTICS---")
+        print(f"Total: {total}")
+        print(f"Used: {used}")
+        print(f"Available: {avail}")
+        print("\n")
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing command: {e}")
+        print(f"Stderr: {e.stderr}")
+        sys.exit(1)
+
+def getMemStat():
+    """
+    This function gathers information about the memory, including the Total memory, Used memory and Available memory
+    """
+    try:
+        mem_stat = subprocess.run(["free", "-h"], capture_output=True, text=True, check=True)
+        mem_row = mem_stat.stdout.splitlines()[1].split()
+        total_mem = mem_row[1]
+        used_mem = mem_row[2]
+        free_mem = mem_row[3]
+        swap_row = mem_stat.stdout.splitlines()[2].split()
+        total_swap = swap_row[1]
+        used_swap = swap_row[2]
+        free_swap = swap_row[3]
+        print(f"---MEMORY STATISTICS---")
+        print(f"Total: {total_mem}")
+        print(f"Used: {used_mem}")
+        print(f"Free: {free_mem}")
+        print(f"---For Memory Overload(Swapping)---")
+        print(f"Total: {total_swap}")
+        print(f"Used: {used_swap}")
+        print(f"Free: {free_swap}")
+        print("\n")
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing command: {e}")
+        print(f"Stderr: {e.stderr}")
+        sys.exit(1)
+
+#def logResult(): 
+#Use git to edit this script and add a function that logs the result of the script to a file
+
+def main():
+    print("Running the System Check Script Now... \n")
+    getProcessInfo()
+    getMemStat()
+    getStorStat()
+
+if __name__ == '__main__':
+    main()
