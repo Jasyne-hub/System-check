@@ -61,7 +61,7 @@ def getMemStat():
         mem_row = mem_stat.stdout.splitlines()[1].split()
         total_mem = mem_row[1]
         used_mem = mem_row[2]
-        free_mem = mem_row[3]
+        free_mem = mem_row[6]
         swap_row = mem_stat.stdout.splitlines()[2].split()
         total_swap = swap_row[1]
         used_swap = swap_row[2]
@@ -69,11 +69,11 @@ def getMemStat():
         print(f"---MEMORY STATISTICS---")
         print(f"Total: {total_mem}")
         print(f"Used: {used_mem}")
-        print(f"Free: {free_mem}")
+        print(f"Available: {free_mem}")
         print(f"---For Memory Overload(Swapping)---")
         print(f"Total: {total_swap}")
         print(f"Used: {used_swap}")
-        print(f"Free: {free_swap}")
+        print(f"Available: {free_swap}")
         print("\n")
     except subprocess.CalledProcessError as e:
         print(f"Error executing command: {e}")
