@@ -120,6 +120,7 @@ def logResult(cpu_info, storage_info, memory_info):
         f.write(f"{memory_info}\n")
         f.write(f"{storage_info}\n\n")
     print(f"Successfully logged to {LOG_FILE}")
+    print("You did it Jason")
 
 
 def main():
