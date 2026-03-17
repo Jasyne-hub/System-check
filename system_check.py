@@ -9,6 +9,11 @@
 
 import subprocess
 import sys
+import os
+from datetime import datetime
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LOG_FILE = os.path.join(BASE_DIR, "system_check.log")
 
 def getProcessInfo():
     """
@@ -24,9 +29,13 @@ def getProcessInfo():
             text=True,
             check=True
             )
+        
         print(f"The processes currently being run by {username} are:")
         print("\n")
         print(result.stdout)
+
+        return result.stdout
+    
     except subprocess.CalledProcessError as e:
         print(f"Error executing command: {e}")
         print(f"Stderr: {e.stderr}")
@@ -37,16 +46,28 @@ def getStorStat():
     This function gathers information about storage space on the system including Total space, Used space and Available space
     """
     try: 
-        storage_stat = subprocess.run(["df", "-h"], capture_output=True, text=True, check=True)
+        storage_stat = subprocess.run(
+            ["df", "-h"], 
+            capture_output=True, 
+            text=True, 
+            check=True
+            )
+        
         row = storage_stat.stdout.splitlines()[2].split()
         used = row[2]
         avail = row[3]
         total = row[1]
+
         print(f"---STORAGE STATISTICS---")
         print(f"Total: {total}")
         print(f"Used: {used}")
         print(f"Available: {avail}")
         print("\n")
+
+        data = f"---STORAGE STATISTICS--- \n Total: {total} \n Used: {used} \n Available: {avail}"
+
+        return data
+    
     except subprocess.CalledProcessError as e:
         print(f"Error executing command: {e}")
         print(f"Stderr: {e.stderr}")
@@ -57,7 +78,13 @@ def getMemStat():
     This function gathers information about the memory, including the Total memory, Used memory and Available memory
     """
     try:
-        mem_stat = subprocess.run(["free", "-h"], capture_output=True, text=True, check=True)
+        mem_stat = subprocess.run(
+            ["free", "-h"], 
+            capture_output=True, 
+            text=True, 
+            check=True
+            )
+        
         mem_row = mem_stat.stdout.splitlines()[1].split()
         total_mem = mem_row[1]
         used_mem = mem_row[2]
@@ -66,6 +93,7 @@ def getMemStat():
         total_swap = swap_row[1]
         used_swap = swap_row[2]
         free_swap = swap_row[3]
+
         print(f"---MEMORY STATISTICS---")
         print(f"Total: {total_mem}")
         print(f"Used: {used_mem}")
@@ -75,19 +103,33 @@ def getMemStat():
         print(f"Used: {used_swap}")
         print(f"Available: {free_swap}")
         print("\n")
+
+        data = f"---MEMORY STATISTICS--- \n Total: {total_mem} \n Used: {used_mem} \n Available: {free_mem} \n ---For Memory Overload(Swapping)--- \n Total: {total_swap} \n Used: {used_swap} \n Available: {free_swap}"
+
+        return data 
     except subprocess.CalledProcessError as e:
         print(f"Error executing command: {e}")
         print(f"Stderr: {e.stderr}")
         sys.exit(1)
 
-#def logResult(): 
+def logResult(cpu_info, storage_info, memory_info):
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(LOG_FILE, 'a') as f:
+        f.write(f"--- {now} ---\n")
+        f.write(f"{cpu_info}\n")
+        f.write(f"{memory_info}\n")
+        f.write(f"{storage_info}\n\n")
+    print(f"Successfully logged to {LOG_FILE}")
+
+
 #Use git to edit this script and add a function that logs the result of the script to a file
 
 def main():
     print("Running the System Check Script Now... \n")
-    getProcessInfo()
-    getMemStat()
-    getStorStat()
+    proc_info = getProcessInfo()
+    mem_info = getMemStat()
+    stor_info = getStorStat()
+    logResult(proc_info, stor_info, mem_info)
 
 if __name__ == '__main__':
     main()
