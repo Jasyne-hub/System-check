@@ -122,8 +122,6 @@ def logResult(cpu_info, storage_info, memory_info):
     print(f"Successfully logged to {LOG_FILE}")
 
 
-#Use git to edit this script and add a function that logs the result of the script to a file
-
 def main():
     print("Running the System Check Script Now... \n")
     proc_info = getProcessInfo()
