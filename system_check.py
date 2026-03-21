@@ -115,12 +115,11 @@ def getMemStat():
 def logResult(cpu_info, storage_info, memory_info):
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(LOG_FILE, 'a') as f:
-        f.write(f"--- {now} ---\n")
-        f.write(f"{cpu_info}\n")
-        f.write(f"{memory_info}\n")
+        f.write(f"--- {now} ---------------------------------------------------------------------------------\n\n")
+        f.write(f"{cpu_info}\n\n")
+        f.write(f"{memory_info}\n\n")
         f.write(f"{storage_info}\n\n")
     print(f"Successfully logged to {LOG_FILE}")
-    print("You did it Jason")
 
 
 def main():
